@@ -1,18 +1,7 @@
 # ansible-redis-replication
 Simple redis replication using ansible as configuration manager
 
-### Run Ansible playbook from local
-create a ssh config file to directly apply / provision the changes through bastion (ssh)
-```
-Host <ip-pattern>
-  User <ssh-user>
-  ProxyCommand ssh -W %h:%p %r@<bastion-ip>
-  ForwardAgent yes
-  StrictHostKeyChecking no
-  UserKnownHostsFile /dev/null
-```
-
-### Install Ansible
+### Install Ansible using virtualenv
 we are going to use virtualenv approach for better isolation and your system cleanliness.
 ```
 # create python virtualenv
