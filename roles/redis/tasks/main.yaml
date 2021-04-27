@@ -1,0 +1,88 @@
+---
+- name: Update apt cache
+  apt: 
+    update_cache: yes
+  tags: redis
+
+- name: Install dependencies
+  apt: 
+    pkg: 
+      - build-essential
+      - tcl
+    state: latest
+  tags: redis
+
+- name: Create redis group
+  ansible.builtin.group:
+    name: redis
+    state: present
+  tags: redis
+
+- name: Create redis user
+  ansible.builtin.user:
+    name: redis
+    group: redis
+    state: present
+  tags: redis
+
+- name: Install redis
+  apt:
+    name: 'redis-server={{redis_version | default("5:5.0.7-2")}}'
+  tags: redis
+
+- name: Create Redis log folder
+  ansible.builtin.file:
+    path: '{{ redis_log_path | default("/var/log/redis") }}'
+    state: directory
+    owner: redis
+    group: redis
+    mode: 0755
+  tags: redis
+
+- name: Create Redis lib folder
+  ansible.builtin.file:
+    path: '{{ redis_lib_path | default("/var/lib/redis") }}'
+    state: directory
+    owner: redis
+    group: redis
+    mode: 0755
+  tags: redis
+
+- name: Create Redis run folder
+  ansible.builtin.file:
+    path: '{{ redis_run_path | default("/var/run/redis") }}'
+    state: directory
+    owner: redis
+    group: redis
+    mode: 0755
+  tags: redis
+
+- name: Copy Redis config file
+  ansible.builtin.template:
+    src: redis.conf.j2
+    dest: /etc/redis/redis.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags: redis
+
+- name: Override Redis Systemd file
+  ansible.builtin.template:
+    src: redis-server.service.j2
+    dest: /lib/systemd/system/redis-server.service
+    owner: root
+    group: root
+  register: redis_server_systemd
+  tags: redis
+
+- name: Reload systemctl
+  ansible.builtin.systemd:
+    daemon_reload: yes
+  tags: redis
+
+- name: Start Redis
+  ansible.builtin.systemd:
+    name: redis-server
+    state: started
+  tags: redis
+...

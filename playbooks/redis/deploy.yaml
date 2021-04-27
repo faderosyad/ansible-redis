@@ -1,0 +1,56 @@
+---
+- name: Running Playbook Redis Server Deployment
+  hosts: 'testing-replication'
+  gather_facts: yes
+  become: yes
+
+  roles:
+    - redis
+
+- name: Edit redis.conf to make master
+  hosts: 'testing-master'
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: Change redis.conf - appendonly
+      lineinfile:
+        path: /etc/redis/redis.conf
+        line: 'appendonly yes'
+        create: no
+    - name: Change redis.conf - appendfilename
+      lineinfile:
+        path: /etc/redis/redis.conf
+        line: 'appendfilename "appendonly.aof"'
+        create: no
+    - name: Allow all access to tcp port 6379
+      community.general.ufw:
+        rule: allow
+        port: '6379'
+        proto: tcp
+    - name: Restart Service
+      service:
+        name: redis-server
+        state: restarted
+
+- name: Edit redis.conf to make slave
+  hosts: 'testing-slave'
+  gather_facts: yes
+  become: yes
+
+  tasks:
+    - name: Allow all access to tcp port 6379
+      community.general.ufw:
+        rule: allow
+        port: '6379'
+        proto: tcp
+    - name: Change redis.conf
+      lineinfile:
+        path: /etc/redis/redis.conf
+        line: 'slaveof <master-ip>'
+        create: no
+    - name: Restart Service
+      service:
+        name: redis-server
+        state: restarted
+...

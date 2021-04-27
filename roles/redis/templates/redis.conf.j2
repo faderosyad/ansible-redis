@@ -1,0 +1,35 @@
+# {{ ansible_managed }}
+
+daemonize yes
+supervised no
+pidfile {{ redis_runfile | default("/var/run/redis/") }}{{ redis_daemon | default("redis-server") }}.pid
+port {{ redis_port | default("6379") }}
+bind {{ redis_bind_interface | default("0.0.0.0") }}
+
+timeout {{ redis_timeout | default("0") }}
+
+loglevel {{ redis_loglevel | default("warning") }}
+logfile {{ redis_logfile | default("/var/log/redis/redis-server.log") }}
+
+# To enable logging to the system logger, just set 'syslog-enabled' to yes,
+# and optionally update the other syslog parameters to suit your needs.
+# syslog-enabled no
+# syslog-ident redis
+# syslog-facility local0
+
+databases {{ redis_databases | default("5") }}
+
+save 900 1
+save 300 10
+save 60 10000
+
+rdbcompression {{ redis_rdbcompression | default("yes") }}
+dbfilename {{ redis_dbfilename | default("dump.rdb") }}
+dir {{ redis_dbdir | default("/var/lib/redis") }}
+
+maxmemory {{ redis_maxmemory | default("1073741824") }}
+maxmemory-policy {{ redis_maxmemory_policy | default("allkeys-lru") }}
+maxmemory-samples {{ redis_maxmemory_samples | default("5") }}
+
+appendfsync {{ redis_appendfsync | default("everysec") }}
+no-appendfsync-on-rewrite no

@@ -1,0 +1,9 @@
+[testing-replication]
+testing-redis-master ansible_host=<master-ip> ansible_connection=ssh ansible_user=faderosyad 
+testing-redis-slave ansible_host=<slave-ip> ansible_connection=ssh ansible_user=faderosyad 
+
+[testing-master]
+testing-redis-master ansible_host=<master-ip> ansible_connection=ssh ansible_user=faderosyad
+
+[testing-slave]
+testing-redis-slave ansible_host=<slave-ip> ansible_connection=ssh ansible_user=faderosyad 
